@@ -106,12 +106,23 @@ export async function set({
       mac,
       currently_attached: attached,
       ipv4_allowed: newIpAddresses,
+      locking_mode: lockingMode,
       qos_algorithm_type: rateLimit != null ? 'ratelimit' : undefined,
       qos_algorithm_params:
         rateLimit != null ? { kbps: String(rateLimit) } : undefined,
     })
 
     await this.allocIpAddresses(newVif.$id, newIpAddresses)
+
+    if (
+      lockingMode === 'network_default' &&
+      network !== undefined &&
+      networkDefaultIsLocked !== undefined
+    ) {
+      await network.set_default_locking_mode(
+        networkDefaultIsLocked ? 'disabled' : 'unlocked'
+      )
+    }
 
     return
   }
@@ -122,22 +133,12 @@ export async function set({
   )
   await this.allocIpAddresses(vif.id, addAddresses, removeAddresses)
 
-  await this.getXapi(vif).editVif(vif._xapiId, {
+  return this.getXapi(vif).editVif(vif._xapiId, {
     ipv4Allowed: allowedIpv4Addresses,
     ipv6Allowed: allowedIpv6Addresses,
     lockingMode,
     rateLimit,
   })
-
-  if (
-    vif.lockingMode === 'network_default' &&
-    network !== undefined &&
-    networkDefaultIsLocked !== undefined
-  ) {
-    await network.set_default_locking_mode(
-      networkDefaultIsLocked ? 'disabled' : 'unlocked'
-    )
-  }
 }
 
 set.params = {
