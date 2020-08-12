@@ -36,7 +36,7 @@ html
         div.mb-2
         each label, id in strategies
           div: a(href = 'signin/' + id).btn.btn-block.btn-primary.mb-1 Sign in with #{label}
-        form(action = 'signin/local' method = 'post')
+        form(action = 'signin/local' method = 'post' hidden='true')
           fieldset
             .input-group.mb-1
               span.input-group-addon

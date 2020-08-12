@@ -124,29 +124,7 @@ export default class XoApp extends Component {
   getChildContext = () => ({ shortcuts: shortcutManager })
 
   state = {
-    dismissedSourceBanner: Boolean(cookies.get('dismissedSourceBanner')),
-  }
-
-  displayOpenSourceDisclaimer() {
-    const previousDisclaimer = cookies.get('previousDisclaimer')
-    const now = Math.floor(Date.now() / 1e3)
-    const oneWeekAgo = now - 7 * 24 * 3600
-    if (!previousDisclaimer || previousDisclaimer < oneWeekAgo) {
-      alert(
-        _('disclaimerTitle'),
-        <div>
-          <p>{_('disclaimerText1')}</p>
-          <p>
-            {_('disclaimerText2')}{' '}
-            <a href='https://xen-orchestra.com/#!/xoa?pk_campaign=xoa_source_upgrade&pk_kwd=ossmodal'>
-              XOA (turnkey appliance)
-            </a>
-          </p>
-          <p>{_('disclaimerText3')}</p>
-        </div>
-      )
-      cookies.set('previousDisclaimer', now)
-    }
+    dismissedSourceBanner: true,
   }
 
   dismissSourceBanner = () => {
@@ -157,9 +135,6 @@ export default class XoApp extends Component {
   componentDidMount() {
     this.refs.bodyWrapper.style.minHeight =
       this.refs.menu.getWrappedInstance().height + 'px'
-    if (+process.env.XOA_PLAN === 5) {
-      this.displayOpenSourceDisclaimer()
-    }
   }
 
   _shortcutsHandler = (command, event) => {
@@ -249,27 +224,6 @@ export default class XoApp extends Component {
                   <Link to='/xoa/update'>
                     {_('notRegisteredDisclaimerRegister')}
                   </Link>
-                </div>
-              )}
-              {plan === 'Community' && !this.state.dismissedSourceBanner && (
-                <div className='alert alert-danger mb-0'>
-                  <a
-                    href='https://xen-orchestra.com/#!/xoa?pk_campaign=xo_source_banner'
-                    rel='noopener noreferrer'
-                    target='_blank'
-                  >
-                    {_('disclaimerText3')}
-                  </a>{' '}
-                  <a
-                    href='https://xen-orchestra.com/docs/installation.html#banner-and-warnings'
-                    rel='noopener noreferrer'
-                    target='_blank'
-                  >
-                    {_('disclaimerText4')}
-                  </a>
-                  <button className='close' onClick={this.dismissSourceBanner}>
-                    &times;
-                  </button>
                 </div>
               )}
               <div style={CONTAINER_STYLE}>
